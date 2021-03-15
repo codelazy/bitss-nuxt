@@ -1,6 +1,155 @@
 <template>
   <v-container fluid  class="fill-height d-flex align-start" color="grey lighten-5">
     <v-row >
+      
+
+      <v-col cols="8">
+        
+        <v-tabs
+          v-model="currentTabItem"
+          fixed-tabs
+          slider-color="white">
+          <v-tab
+            v-for="(typeTab, index) in bitss_types"
+            :key="index"
+            :href="'#tab-' + typeTab">
+            {{ typeTab }}
+          </v-tab>
+        </v-tabs>
+
+        <v-tabs-items v-model="currentTabItem">
+          <v-tab-item
+            v-for="(typeTab, index) in bitss_types"
+            :key="index"
+            :value="'tab-' + typeTab">
+            <v-card flat class="py-4 px-8">
+              <template v-for="(typeList, index) in filtered_type_value">
+                
+                <template v-if="typeList.type === typeTab">
+
+                  <template v-if="typeTab === 'free'">
+                    <v-alert
+                      :key="index"
+                      text
+                      dense
+                      color="teal"
+                      icon="mdi-clock-fast"
+                      border="left">
+                      <b>NOTE:</b> Choose one only. 
+                    </v-alert>
+                    <v-data-table
+                      v-model="table_parent_model_[index]"
+                      :headers="typeHeaders"
+                      :items="typeList.typeData"
+                      :single-select="true"
+                      show-select
+                      item-key="subCategory"
+                      item-class="row_classes"
+                      :search="search">
+                      <template v-slot:header.price="{ on , props }">
+
+                      </template>
+                      <template v-slot:item.subCategory="{ item }">
+                        {{company_name}}.{{item.subCategory}}
+                      </template>
+                      <template v-slot:item.price="{ item }">
+                        <template v-if="item.price">
+                          ${{item.price}}.00
+                        </template>
+                      </template>
+                    </v-data-table>
+                  </template>
+                  <template v-if="typeTab === 'premium'">
+                    <v-data-table
+                      v-model="table_parent_model_[index]"
+                      :headers="typeHeaders"
+                      :items="typeList.typeData"
+                      show-select
+                      item-key="subCategory"
+                      item-class="row_classes"
+                      :search="search">
+
+                      <template v-slot:item.subCategory="{ item }">
+                        {{company_name}}.{{item.subCategory}}
+                      </template>
+                      <template v-slot:item.price="{ item }">
+                        <template v-if="item.price">
+                          ${{item.price}}.00
+                        </template>
+                      </template>
+                    </v-data-table>
+                  </template>
+                </template>
+              </template>
+
+              <v-card-text>
+                  
+                <template v-if="typeTab === 'package'">
+                  <v-tabs
+                   v-model="subcurrentTabItem"
+                    fixed-tabs
+                    slider-color="white">
+                    <v-tab
+                      v-for="i in api"
+                      :key="i.category"
+                      :href="'#tab-' + i.category">
+                      {{ i.category }} -  ${{i.totalPrice}}.00
+                    </v-tab>
+                  </v-tabs>
+                  
+                  <v-tabs-items v-model="subcurrentTabItem">
+                    <v-tab-item
+                      v-for="(i, j) in api"
+                      :key="j"
+                      :value="'tab-' + i.category">
+                      
+                      <v-card flat>
+                        <v-card-text>
+
+                          <template v-for="(category, index) in filtered_category">
+                            
+                            <template v-if="category.category === i.category">
+                              <v-data-table
+
+                                class="child-table"
+                                v-model="table_model_[index]"
+                                :headers="subHeaders"
+                                :items="category.subCategories"
+                                item-key="subCategory"
+                                show-select
+                                item-class="row_classes"
+                                :search="search">
+                                  <!-- <template v-slot:header.data-table-select="{ on , props }">
+
+                                  </template> -->
+                                  <template v-slot:item.subCategory="{ item }">
+                                    {{company_name}}.{{item.subCategory}}
+                                  </template>
+                                  <template v-slot:item.price="{ item }">
+                                    <template v-if="item.price">
+                                      ${{item.price}}.00
+                                    </template>
+                                  </template>
+                              </v-data-table>
+                            </template>
+                          </template>
+
+                          
+                          
+                        </v-card-text>
+                      </v-card>
+                    </v-tab-item>
+                  </v-tabs-items>
+
+
+                </template>
+              </v-card-text>
+            </v-card>
+          </v-tab-item>
+        </v-tabs-items>
+
+        
+      </v-col>
       <v-col cols="4">
         <v-sheet color="white" class="fill-height px-4 py-4">
           <v-text-field
@@ -79,11 +228,34 @@
               <v-card-text>
                 <v-data-table
                   :headers="headers"
-                  :items="filtered_table_merged(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])"
+                  :items="filtered_table_merged(table_parent_model_[0], table_parent_model_[1])"
                   :hide-default-footer="true"
                   item-class="row_classes">
-                  
                 </v-data-table>
+                <hr/>
+                <br/><br/>
+                <h4>Package(s)</h4>
+                <template v-for="(category, index) in filtered_category">
+                  <template v-if="filtered_table_merged(table_model_[index]).length != 1">
+                    <v-row>
+                      <v-col cols="8">
+                        <h5>{{category.category}}</h5>
+                      </v-col>
+                      <v-col cols="4">
+                        <template v-if="category.totalPrice">
+                          <b>${{category.totalPrice}}.00</b>
+                        </template>
+                      </v-col>
+                    </v-row>
+                    <v-data-table
+                      :headers="packageHeaders"
+                      :items="filtered_table_merged(table_model_[index])"
+                      :hide-default-footer="true"
+                      item-class="row_classes">
+                    </v-data-table>
+                  </template>
+                </template>
+
                 <hr/>
                 <br/>
                 <p style="text-align: right;"><b>Total: ${{filtered_total_cost(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])}}.00</b></p>
@@ -111,129 +283,6 @@
         </v-sheet> 
         
       </v-col>
-
-      <v-col cols="8">
-        
-        <v-tabs
-          v-model="currentTabItem"
-          fixed-tabs
-          slider-color="white">
-          <v-tab
-            v-for="(typeTab, index) in bitss_types"
-            :key="index"
-            :href="'#tab-' + typeTab">
-            {{ typeTab }}
-          </v-tab>
-        </v-tabs>
-
-        <v-tabs-items v-model="currentTabItem">
-          <v-tab-item
-            v-for="(typeTab, index) in bitss_types"
-            :key="index"
-            :value="'tab-' + typeTab">
-            <v-card flat>
-              <template v-for="(typeList, index) in filtered_type_value">
-                
-                <template v-if="typeList.type === typeTab">
-
-                  <template v-if="typeTab === 'free'">
-                    <v-data-table
-                      v-model="table_parent_model_[index]"
-                      :headers="typeHeaders"
-                      :items="typeList.typeData"
-                      :single-select="true"
-                      show-select
-                      item-key="subCategory"
-                      item-class="row_classes"
-                      :search="search">
-
-                      <template v-slot:item.subCategory="{ item }">
-                        {{company_name}}.{{item.subCategory}}
-                      </template>
-                    </v-data-table>
-                  </template>
-                  <template v-if="typeTab === 'premium'">
-                    <v-data-table
-                      v-model="table_parent_model_[index]"
-                      :headers="typeHeaders"
-                      :items="typeList.typeData"
-                      show-select
-                      item-key="subCategory"
-                      item-class="row_classes"
-                      :search="search">
-
-                      <template v-slot:item.subCategory="{ item }">
-                        {{company_name}}.{{item.subCategory}}
-                      </template>
-                    </v-data-table>
-                  </template>
-                </template>
-              </template>
-
-              <v-card-text>
-                  
-                <template v-if="typeTab === 'package'">
-                  <v-tabs
-                   v-model="subcurrentTabItem"
-                    fixed-tabs
-                    slider-color="white">
-                    <v-tab
-                      v-for="i in api"
-                      :key="i.category"
-                      :href="'#tab-' + i.category">
-                      {{ i.category }} -  ${{i.totalPrice}}.00
-                    </v-tab>
-                  </v-tabs>
-                  
-                  <v-tabs-items v-model="subcurrentTabItem">
-                    <v-tab-item
-                      v-for="(i, j) in api"
-                      :key="j"
-                      :value="'tab-' + i.category">
-                      
-                      <v-card flat>
-                        <v-card-text>
-
-                          <template v-for="(category, index) in filtered_category">
-                            
-                            <template v-if="category.category === i.category">
-                              <v-data-table
-
-                                class="child-table"
-                                v-model="table_model_[index]"
-                                :headers="subHeaders"
-                                :items="category.subCategories"
-                                item-key="subCategory"
-                                show-select
-                                item-class="row_classes"
-                                :search="search">
-                                  <!-- <template v-slot:header.data-table-select="{ on , props }">
-
-                                  </template> -->
-                                  <template v-slot:item.subCategory="{ item }">
-                                    {{company_name}}.{{item.subCategory}}
-                                  </template>
-                              </v-data-table>
-                            </template>
-                          </template>
-
-                          
-                          
-                        </v-card-text>
-                      </v-card>
-                    </v-tab-item>
-                  </v-tabs-items>
-
-
-                </template>
-              </v-card-text>
-            </v-card>
-          </v-tab-item>
-        </v-tabs-items>
-
-        
-      </v-col>
-
     </v-row>
   </v-container>
 </template>
@@ -324,13 +373,19 @@ export default {
           align: 'start',
           sortable: false,
           value: 'subCategory',
-        }
-        // {
-        //   text: 'Price',
-        //   align: 'start',
-        //   sortable: false,
-        //   value: 'price',
-        // },
+        },
+        {
+          text: 'Type',
+          align: 'start',
+          sortable: false,
+          value: 'type',
+        },
+        {
+          text: 'Price',
+          align: 'start',
+          sortable: false,
+          value: 'price',
+        },
         // {text: 'Action', value: 'actions', sortable: false},
       ],
       
@@ -362,11 +417,26 @@ export default {
       const flatArrayPackage = _.flatten([value3, value4, value5]);
       const concatArray = _.concat(value1, value2);
       const concatArrayPackage = _.concat(value3, value4, value5);
+      const uniqArrayPackage = _.uniqBy(concatArrayPackage, 'totalPrice');
+
+      const totalPriceArray = _.map(uniqArrayPackage, item => {
+        
+        if (item) {
+
+          return {
+            price: item.totalPrice
+          }
+        }
+      });
+      console.log(uniqArrayPackage);
       const uniqArray = _.uniqBy(concatArray, 'subCategory');
+
+      const uniqArrayTotal = _.flatten([totalPriceArray, concatArray]);
+
       
-      const totalCost = _.sumBy(concatArray, function (cost) {
+      const totalCost = _.sumBy(uniqArrayTotal, function (cost) {
         if(cost) {
-          return cost.price
+          return cost.price;
         }
         
       });
@@ -405,10 +475,10 @@ export default {
       this.api = [
         {category: "Sale", 
           subCategories: [
-            { subCategory: 'today.sale', price: 0, type: 'free', active: true, is_package: true},
-            { subCategory: 'sunday.sale', price: 0, type: 'premium', active: true, is_package: true},
-            { subCategory: 'friday.sale', price: 0, type: 'premium', active: true, is_package: true},
-            { subCategory: 'monday.sale', price: 0, type: 'free', active: true, is_package: true},
+            { subCategory: 'today.sale', price: 0, type: 'free', active: true, is_package: false, duration: '90'},
+            { subCategory: 'sunday.sale', price: 40, type: 'premium', active: true, is_package: false},
+            { subCategory: 'friday.sale', price: 80, type: 'premium', active: true, is_package: true},
+            { subCategory: 'monday.sale', price: 0, type: 'free', active: true, is_package: false},
             { subCategory: 'special.sale', price: 50, type: 'premium', active: false, is_package: true},
             { subCategory: 'anniv.sale', price: 70, type: 'premium', active: true, is_package: false}, 
             { subCategory: 'tuesday.sale', price: 70, type: 'premium', active: true, is_package: true}, 
@@ -420,7 +490,7 @@ export default {
         },
         {category: "Promo", 
           subCategories: [
-            { subCategory: 'todays.promo', price: 0, type: 'free', active: true, is_package: true},
+            { subCategory: 'todays.promo', price: 0, type: 'free', active: true, is_package: false, duration: '120'},
             { subCategory: 'now.promo', price: 30, type: 'premium', active: true, is_package: true},
             { subCategory: 'anniv.promo', price: 60, type: 'premium', active: true, is_package: false}, 
             { subCategory: 'manila-sale.promo', price: 80, type: 'premium', active: true, is_package: true}, 
@@ -484,6 +554,7 @@ export default {
             subCategory: item.subCategory,
             status: item.active,
             price: item.price,
+            totalPrice: totalPrice,
             type: item.type,
             is_package: item.is_package,
           }
