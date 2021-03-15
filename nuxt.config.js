@@ -52,7 +52,8 @@ export default {
       dark: false,
       themes: {
         light: {
-          primary: colors.purple.darken3,
+          primary: colors.amber.darken3,
+          background: colors.blue.lighten5,
         },
         dark: {
           primary: colors.blue.darken2,

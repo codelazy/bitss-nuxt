@@ -13,27 +13,35 @@
         </v-row>
     </v-container>
     <v-sheet color="primary" class="pt-8 px-8 pb-2">
-      <v-row>
-        <v-col cols="12" sm="4" md="5">
-          <v-text-field
-            outlined
-            background-color="white"
-            :placeholder="$t('homepage.form.textfieldLinkPlaceholder')"></v-text-field>
-        </v-col>
-        <v-col cols="12" sm="4" md="5">
-          <v-text-field
-            outlined
-            background-color="white"
-            :placeholder="$t('homepage.form.textfieldBrandPlaceholder')"></v-text-field>
-        </v-col>
-        <v-col cols="12" sm="4" md="2">
-          <v-btn
-            block
-            depressed
-            x-large
-            color="yellow darken-1">{{$t('homepage.form.btnSubmit')}}</v-btn>
-        </v-col>
-      </v-row>
+      <form action="/result">
+        <v-row>
+          <v-col cols="12" sm="4" md="5">
+            <v-text-field
+              v-model="company_name"
+              name="company_name"
+              outlined
+              background-color="white"
+              :placeholder="$t('homepage.form.textfieldLinkPlaceholder')"></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="4" md="5">
+            <v-text-field
+              v-model="company_url"
+              name="company_url"
+              outlined
+              background-color="white"
+              :placeholder="$t('homepage.form.textfieldBrandPlaceholder')"></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="4" md="2">
+            <v-btn
+              type="submit"
+              @click.stop.prevent="submit()"
+              block
+              depressed
+              x-large
+              color="yellow darken-1">{{$t('homepage.form.btnSubmit')}}</v-btn>
+          </v-col>
+        </v-row>
+      </form>
     </v-sheet>
   </v-main>
 </template>
@@ -46,6 +54,19 @@ export default {
   components: {
     Logo,
     VuetifyLogo
+  },
+  data() {
+    return {
+      company_name: null,
+      company_url: null
+    }
+  },
+  methods: {
+    submit(){
+        //if you want to send any data into server before redirection then you can do it here
+      // this.$router.push("/result?"+{company_name: this.company_name});
+      this.$router.push({ path: 'result', query: { company_name: this.company_name, company_url: this.company_url } })
+    }
   }
 }
 </script>

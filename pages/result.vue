@@ -136,6 +136,7 @@
       <v-col cols="4">
         <v-sheet color="white" class="fill-height px-4 py-4">
           <h2>company name: {{company_name}}</h2>
+          <h2>company url: {{companyUrl}}</h2>
           
           <v-data-table
             :headers="headers"
@@ -218,7 +219,8 @@ export default {
   data() {
     return {
       dialog: false,
-      companyName: '',
+      companyName: this.$route.query.company_name,
+      companyUrl: this.$route.query.company_url,
       search: '',
       currentTabItem: 'tab-Web',
       subcurrentTabItem: '',
@@ -365,6 +367,9 @@ export default {
             { subCategory: 'anniv.sale', price: 70, type: 'premium', active: true, is_package: false}, 
             ],
           totalPrice: 30,
+          dir: '/bitss',
+          path: '/sale',
+          slug: 'sale'
         },
         {category: "Promo", 
           subCategories: [
@@ -373,6 +378,9 @@ export default {
             { subCategory: 'anniv.promo', price: 60, type: 'premium', active: true, is_package: false}, 
             ],
             totalPrice: 20,
+            dir: '/bitss',
+            path: '/promo',
+            slug: 'promo'
         },
         {category: "Today", 
           subCategories: [

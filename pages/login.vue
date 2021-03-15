@@ -48,6 +48,7 @@
 </template>
 <script>
 export default {
+  layout: 'form-login',
   data() {
     return {
       name: '',
