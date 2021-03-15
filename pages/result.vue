@@ -1,18 +1,119 @@
 <template>
   <v-container fluid  class="fill-height d-flex align-start" color="grey lighten-5">
     <v-row >
-      <v-col cols="8">
-        <v-text-field
-          v-model="company_name"
-          color="white"
-          :label="$t('login.form.namePlaceholder')"
-          single-line
-          elevation="0"
-          class="py-2 mb-4"
-          elevate="1"
-          solo
-        ></v-text-field>
+      <v-col cols="4">
+        <v-sheet color="white" class="fill-height px-4 py-4">
+          <v-text-field
+            label="Company Name"
+            v-model="company_name"
+            color="white"
+            elevation="0"
+            class="py-2 mb-4"
+            elevate="0"
+            outlined
+          ></v-text-field>
 
+          <v-text-field
+            label="Company URL"
+            v-model="companyUrl"
+            color="white"
+            elevation="0"
+            class="py-2 mb-4"
+            elevate="0"
+            outlined
+          ></v-text-field>
+
+          <v-data-table
+            :headers="headers"
+            :items="filtered_table_merged(table_parent_model_[0], table_parent_model_[1])"
+            :hide-default-footer="true"
+            item-class="row_classes">
+          </v-data-table>
+
+          <h4>Package(s)</h4>
+          <template v-for="(category, index) in filtered_category">
+            <template v-if="filtered_table_merged(table_model_[index]).length != 1">
+              <v-row>
+                <v-col cols="8">
+                  <h5>{{category.category}}</h5>
+                </v-col>
+                <v-col cols="4">
+                  <template v-if="category.totalPrice">
+                    <b>${{category.totalPrice}}.00</b>
+                  </template>
+                </v-col>
+              </v-row>
+              <v-data-table
+                :headers="packageHeaders"
+                :items="filtered_table_merged(table_model_[index])"
+                :hide-default-footer="true"
+                item-class="row_classes">
+              </v-data-table>
+            </template>
+          </template>
+
+          <hr/>
+          <br/>
+          <p style="text-align: right;"><b>Total: ${{filtered_total_cost(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])}}.00</b></p>
+          <br/><br/>
+          <v-dialog
+            v-model="dialog"
+            persistent
+            max-width="800"
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn block
+                v-bind="attrs"
+                v-on="on"
+                :disabled="company_name.length == 0"
+                color="primary"
+                class="py-6 px-10">
+                SUBMIT
+              </v-btn>
+             
+            </template>
+            <v-card>
+              <v-card-title class="headline">
+                CHECKOUT
+              </v-card-title>
+              <v-card-text>
+                <v-data-table
+                  :headers="headers"
+                  :items="filtered_table_merged(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])"
+                  :hide-default-footer="true"
+                  item-class="row_classes">
+                  
+                </v-data-table>
+                <hr/>
+                <br/>
+                <p style="text-align: right;"><b>Total: ${{filtered_total_cost(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])}}.00</b></p>
+                <br/><br/>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="grey darken-1"
+                  text
+                  @click="dialog = false"
+                >
+                  Cancel
+                </v-btn>
+                <v-btn
+                  color="primary"
+                  @click="dialog = false"
+                >
+                  Submit
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          
+        </v-sheet> 
+        
+      </v-col>
+
+      <v-col cols="8">
+        
         <v-tabs
           v-model="currentTabItem"
           fixed-tabs
@@ -133,78 +234,6 @@
         
       </v-col>
 
-      <v-col cols="4">
-        <v-sheet color="white" class="fill-height px-4 py-4">
-          <h2>company name: {{company_name}}</h2>
-          <h2>company url: {{companyUrl}}</h2>
-          
-          <v-data-table
-            :headers="headers"
-            :items="filtered_table_merged(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])"
-            :hide-default-footer="true"
-            item-class="row_classes">
-          </v-data-table>
-          <hr/>
-          <br/>
-          <p style="text-align: right;"><b>Total: ${{filtered_total_cost(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])}}.00</b></p>
-          <br/><br/>
-          <v-dialog
-            v-model="dialog"
-            persistent
-            max-width="800"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn block
-                v-bind="attrs"
-                v-on="on"
-                :disabled="company_name.length == 0"
-                color="primary"
-                class="py-6 px-10">
-                SUBMIT
-              </v-btn>
-             
-            </template>
-            <v-card>
-              <v-card-title class="headline">
-                CHECKOUT
-              </v-card-title>
-              <v-card-text>
-                <v-data-table
-                  :headers="headers"
-                  :items="filtered_table_merged(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])"
-                  :hide-default-footer="true"
-                  item-class="row_classes">
-                  
-                </v-data-table>
-                <hr/>
-                <br/>
-                <p style="text-align: right;"><b>Total: ${{filtered_total_cost(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])}}.00</b></p>
-                <br/><br/>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                  color="grey darken-1"
-                  text
-                  @click="dialog = false"
-                >
-                  Cancel
-                </v-btn>
-                <v-btn
-                  color="primary"
-                  @click="dialog = false"
-                >
-                  Submit
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-          
-        </v-sheet> 
-        
-      </v-col>
-
-      
     </v-row>
   </v-container>
 </template>
@@ -257,6 +286,21 @@ export default {
           align: 'start',
           sortable: false,
           value: 'price',
+        },
+        
+      ],
+      packageHeaders: [
+        {
+          text: 'Domain',
+          align: 'start',
+          sortable: false,
+          value: 'subCategory',
+        },
+        {
+          text: 'Type',
+          align: 'start',
+          sortable: false,
+          value: 'type',
         },
         
       ],
@@ -314,12 +358,11 @@ export default {
     //   return newValue;
     // },
     filtered_total_cost ( value1, value2, value3, value4, value5) {
-      const flatArray = _.flatten([value1, value2, value3, value4, value5]);
-      const concatArray = _.concat(value1, value2, value3, value4, value5);
-      
+      const flatArray = _.flatten([value1, value2]);
+      const flatArrayPackage = _.flatten([value3, value4, value5]);
+      const concatArray = _.concat(value1, value2);
+      const concatArrayPackage = _.concat(value3, value4, value5);
       const uniqArray = _.uniqBy(concatArray, 'subCategory');
-      
-      console.log(uniqArray);
       
       const totalCost = _.sumBy(concatArray, function (cost) {
         if(cost) {
@@ -363,9 +406,13 @@ export default {
         {category: "Sale", 
           subCategories: [
             { subCategory: 'today.sale', price: 0, type: 'free', active: true, is_package: true},
+            { subCategory: 'sunday.sale', price: 0, type: 'premium', active: true, is_package: true},
+            { subCategory: 'friday.sale', price: 0, type: 'premium', active: true, is_package: true},
+            { subCategory: 'monday.sale', price: 0, type: 'free', active: true, is_package: true},
             { subCategory: 'special.sale', price: 50, type: 'premium', active: false, is_package: true},
             { subCategory: 'anniv.sale', price: 70, type: 'premium', active: true, is_package: false}, 
-            ],
+            { subCategory: 'tuesday.sale', price: 70, type: 'premium', active: true, is_package: true}, 
+          ],
           totalPrice: 30,
           dir: '/bitss',
           path: '/sale',
@@ -376,19 +423,24 @@ export default {
             { subCategory: 'todays.promo', price: 0, type: 'free', active: true, is_package: true},
             { subCategory: 'now.promo', price: 30, type: 'premium', active: true, is_package: true},
             { subCategory: 'anniv.promo', price: 60, type: 'premium', active: true, is_package: false}, 
-            ],
-            totalPrice: 20,
-            dir: '/bitss',
-            path: '/promo',
-            slug: 'promo'
+            { subCategory: 'manila-sale.promo', price: 80, type: 'premium', active: true, is_package: true}, 
+          ],
+          totalPrice: 20,
+          dir: '/bitss',
+          path: '/promo',
+          slug: 'promo'
         },
         {category: "Today", 
           subCategories: [
             { subCategory: 'reserve.today', price: 0, type: 'free', active: false, is_package: false},
             { subCategory: 'sign-up.today', price: 80, type: 'premium', active: true, is_package: true},
             { subCategory: 'promo.today', price: 90, type: 'premium', active: false, is_package: false}, 
-            ],
-            totalPrice: 10,
+            { subCategory: 'discount.today', price: 90, type: 'premium', active: true, is_package: true},
+          ],
+          totalPrice: 10,
+          dir: '/bitss',
+          path: '/today',
+          slug: 'today'
         },
       ];
     },
@@ -416,7 +468,7 @@ export default {
         // const activeBitss = _.filter(newApi.subCategories, 'active');
         const category =  newApiGroup.category;
         
-        const price = newApiGroup.totalPrice;
+        const totalPrice = newApiGroup.totalPrice;
         // const inActiveSubCategoriesDefault = _.filter(newApiGroup.subCategories, function(item){
         //   const subCatListActive =  item.active === true;
           
@@ -431,14 +483,15 @@ export default {
           return {
             subCategory: item.subCategory,
             status: item.active,
+            price: item.price,
             type: item.type,
-            price: price,
             is_package: item.is_package,
           }
         });
         
         return {
           category,
+          totalPrice,
           subCategories
         }
         

@@ -34,6 +34,7 @@
           <v-col cols="12" sm="4" md="2">
             <v-btn
               type="submit"
+              :disabled="!(company_name && company_url)"
               @click.stop.prevent="submit()"
               block
               depressed
