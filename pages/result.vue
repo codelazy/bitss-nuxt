@@ -153,7 +153,7 @@
       <v-col cols="4">
         <v-sheet color="white" class="fill-height px-4 py-4">
           
-          {{filter_subCategory_taken(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])}}
+          <!-- {{filter_subCategory_taken(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])}} -->
           <v-text-field
             label="Company Name"
             v-model="company_name"
@@ -173,13 +173,80 @@
             elevate="0"
             outlined
           ></v-text-field>
-
-          <v-data-table
+          
+          <template v-if="get_type(table_parent_model_[0]) == 'free' && filtered_table_merged(table_parent_model_[1]).length == 1">
+            <v-data-table
             :headers="headers"
-            :items="filtered_table_merged(table_parent_model_[0], table_parent_model_[1])"
+            :items="table_parent_model_[0]"
             :hide-default-footer="true"
             item-class="row_classes">
-          </v-data-table>
+              <template v-slot:header.price="{ on , props }">
+
+              </template>
+              <template v-slot:item.price="{ item }">
+                <template v-if="item.price">
+                </template>
+              </template>
+            </v-data-table>
+            <br/><br/>
+            
+            <v-dialog
+              v-model="dialogFree"
+              persistent
+              max-width="800">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn block
+                  v-bind="attrs"
+                  v-on="on"
+                  :disabled="company_name.length == 0"
+                  color="primary"
+                  class="py-6 px-10">
+                  SEND
+                </v-btn>
+              
+              </template>
+              <v-card>
+                <v-card-title class="headline">
+                  SHARE
+                </v-card-title>
+                <v-card-text>
+                  
+                  <v-text-field @click:append="copyText" outlined append-icon="mdi-content-copy" readonly :v-model="get_bitss_single_value(table_parent_model_[0])" ref="textToCopy" :value="get_bitss_single_value(table_parent_model_[0])"></v-text-field>
+                  <v-btn @click="copyText">copy</v-btn>
+                  <v-btn color="green">Share</v-btn>
+
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="grey darken-1"
+                    text
+                    @click="dialogFree = false"
+                  >
+                    Cancel
+                  </v-btn>
+                  <v-btn
+                    color="primary"
+                    @click="dialogFree = false"
+                  >
+                    SEND
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+
+
+          </template>
+          <template v-else>  
+            <template v-if="filtered_table_merged(table_parent_model_[0], table_parent_model_[1]).length != 1"> 
+              <v-data-table
+                :headers="headers"
+                :items="filtered_table_merged(table_parent_model_[0], table_parent_model_[1])"
+                :hide-default-footer="true"
+                item-class="row_classes">
+              </v-data-table>
+            </template>
+          </template>
 
           <template v-for="(category, index) in filtered_category">
             <template v-if="filtered_table_merged(table_model_[index]).length != 1">
@@ -202,115 +269,120 @@
             </template>
           </template>
 
-          <hr/>
-          <br/>
-          <h4>Choose Plan Type:</h4>
-          
-          <v-radio-group
-            v-model="planTypes"
-            column>
-            <v-radio
-              label="per month"
-              color="primary"
-              value="planTypeMonths"></v-radio>
-            <v-radio
-              label="3 months"
-              color="primary"
-              value="planType3Months"></v-radio>
-            <v-radio
-              label="6 months"
-              color="primary"
-              value="planType6Months"></v-radio>
-            <v-radio
-              label="12 months"
-              color="primary"
-              value="planType12Months"></v-radio>
-          </v-radio-group>
+          <template v-if="(get_type(table_parent_model_[0]) == 'free' && filtered_table_merged(table_parent_model_[1]).length != 1) || filtered_table_merged(table_model_[0]).length != 1 || filtered_table_merged(table_model_[1]).length != 1 || filtered_table_merged(table_model_[2]).length != 1">
+            <hr/>
+            <br/>
+            <h4>Choose Plan Type:</h4>
             
-
-          <p style="text-align: right;"><b>Total: ${{filtered_total_cost(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])}}</b></p>
-          <br/><br/>
-          <v-dialog
-            v-model="dialog"
-            persistent
-            max-width="800"
-          >
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn block
-                v-bind="attrs"
-                v-on="on"
-                :disabled="company_name.length == 0"
+            <v-radio-group
+              v-model="planTypes"
+              column>
+              <v-radio
+                label="per month"
                 color="primary"
-                class="py-6 px-10">
-                SUBMIT
-              </v-btn>
-             
-            </template>
-            <v-card>
-              <v-card-title class="headline">
-                CHECKOUT
-              </v-card-title>
-              <v-card-text>
-                <v-data-table
-                  :headers="headers"
-                  :items="filtered_table_merged(table_parent_model_[0], table_parent_model_[1])"
-                  :hide-default-footer="true"
-                  item-class="row_classes">
-                </v-data-table>
-                <hr/>
-                <br/><br/>
-                <template v-for="(category, index) in filtered_category">
-                  <template v-if="filtered_table_merged(table_model_[index]).length != 1">
-                    <v-row>
-                      <v-col cols="8">
-                        <h5>{{category.category}}</h5>
-                      </v-col>
-                      <v-col cols="4">
-                        <template v-if="category.totalPrice">
-                          <b>${{category.totalPrice}}</b>
-                        </template>
-                      </v-col>
-                    </v-row>
-                    <v-data-table
-                      :headers="packageHeaders"
-                      :items="filtered_table_merged(table_model_[index])"
-                      :hide-default-footer="true"
-                      item-class="row_classes">
-                    </v-data-table>
-                  </template>
-                </template>
+                value="planTypeMonths"></v-radio>
+              <v-radio
+                label="3 months"
+                color="primary"
+                value="planType3Months"></v-radio>
+              <v-radio
+                label="6 months"
+                color="primary"
+                value="planType6Months"></v-radio>
+              <v-radio
+                label="12 months"
+                color="primary"
+                value="planType12Months"></v-radio>
+            </v-radio-group>
+              
 
-                <hr/>
-                <br/>
-                <p style="text-align: right;"><b>Total: 
-                  <template v-if="filtered_total_cost(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])">
-                    0.00
-                  </template>
-                  <template v-else>
-                    ${{filtered_total_cost(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])}}
-                  </template>
-                </b></p>
-                <br/><br/>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                  color="grey darken-1"
-                  text
-                  @click="dialog = false"
-                >
-                  Cancel
-                </v-btn>
-                <v-btn
-                  color="primary"
-                  @click="dialog = false"
-                >
-                  Submit
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+            <p style="text-align: right;"><b>Total: ${{filtered_total_cost(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])}}</b></p>
           
+            <br/><br/>
+            <v-dialog
+              v-model="dialog"
+              persistent
+              max-width="800">
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn block
+                  v-bind="attrs"
+                  v-on="on"
+                  :disabled="company_name.length == 0"
+                  color="primary"
+                  class="py-6 px-10">
+                  SEND
+                </v-btn>
+              
+              </template>
+              <v-card>
+                <v-card-title class="headline">
+                  CHECKOUT
+                </v-card-title>
+                <v-card-text>
+                  <v-data-table
+                    :headers="headers"
+                    :items="filtered_table_merged(table_parent_model_[0], table_parent_model_[1])"
+                    :hide-default-footer="true"
+                    item-class="row_classes">
+                  </v-data-table>
+                  <hr/>
+                  <br/><br/>
+                  <template v-for="(category, index) in filtered_category">
+                    <template v-if="filtered_table_merged(table_model_[index]).length != 1">
+                      <v-row>
+                        <v-col cols="8">
+                          <h5>{{category.category}}</h5>
+                        </v-col>
+                        <v-col cols="4">
+                          <template v-if="category.totalPrice">
+                            <b>${{category.totalPrice}}</b>
+                          </template>
+                        </v-col>
+                      </v-row>
+                      <v-data-table
+                        :headers="packageHeaders"
+                        :items="filtered_table_merged(table_model_[index])"
+                        :hide-default-footer="true"
+                        item-class="row_classes">
+                      </v-data-table>
+                    </template>
+                  </template>
+
+                  <hr/>
+                  <br/>
+                  <p style="text-align: right;"><b>Total: 
+                    <template v-if="filtered_total_cost(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])">
+                      0.00
+                    </template>
+                    <template v-else>
+                      ${{filtered_total_cost(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])}}
+                    </template>
+                  </b></p>
+                  <br/><br/>
+                </v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="grey darken-1"
+                    text
+                    @click="dialog = false"
+                  >
+                    Cancel
+                  </v-btn>
+                  <v-btn
+                    color="primary"
+                    @click="dialog = false"
+                  >
+                    Submit
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </template>
+          <template v-else>
+            
+          </template>
+
         </v-sheet> 
         
       </v-col>
@@ -328,6 +400,7 @@ export default {
   data() {
     return {
       dialog: false,
+      dialogFree: false,
       companyName: this.$route.query.company_name,
       companyUrl: this.$route.query.company_url,
       search: '',
@@ -444,6 +517,22 @@ export default {
     //   });
     //   return newValue;
     // },
+    copyText () {
+      let textToCopy = this.$refs.textToCopy.$el.querySelector('input')
+      textToCopy.select()
+      document.execCommand("copy");
+    },
+    get_bitss_single_value(value1) {
+      const concatArray = _.concat(value1);
+      const newCompanyName = this.companyName;
+      const uniqType = _.chain(concatArray).map("subCategory").flatten().value();
+      return newCompanyName + '.' + uniqType;
+    },
+    get_type(value1) {
+      const concatArray = _.concat(value1);
+      const uniqType = _.chain(concatArray).map("type").flatten().value();
+      return uniqType;
+    },
     filter_subCategory_taken ( value1, value2, value3, value4, value5) {
       const newCompanyName = this.companyName;
       const takenSubCatArray = this.userApi;
