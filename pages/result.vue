@@ -151,26 +151,26 @@
         
       </v-col>
       <v-col cols="4">
-        <v-sheet color="white" class="fill-height px-4 py-4">
+        <v-sheet color="white" class="fill-height px-6 py-4">
           
           <!-- {{filter_subCategory_taken(table_parent_model_[0], table_parent_model_[1], table_model_[0], table_model_[1], table_model_[2])}} -->
           <v-text-field
             label="Company Name"
             v-model="company_name"
-            color="white"
+            color="primary"
+            dense
             elevation="0"
             class="py-2 mb-4"
-            elevate="0"
             outlined
           ></v-text-field>
 
           <v-text-field
             label="Company URL"
             v-model="companyUrl"
-            color="white"
+            color="primary"
+            dense
             elevation="0"
             class="py-2 mb-4"
-            elevate="0"
             outlined
           ></v-text-field>
           

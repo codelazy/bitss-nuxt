@@ -33,6 +33,7 @@
         elevation="0"
         class="py-2"
       >
+        <v-flex class="d-flex justify-space-between">
           <v-img
             class="d-flex"
             lazy-src="https://bitss.com/assets/img/bitss-logo.jpg"
@@ -40,8 +41,28 @@
             max-width="120"
             src="https://bitss.com/assets/img/bitss-logo.jpg"
           ></v-img>
-          <nuxt-link :to="switchLocalePath('en')" class="mx-4">English</nuxt-link>
-          <nuxt-link :to="switchLocalePath('zh')" class="mx-4">Chinese</nuxt-link>
+          <!-- <nuxt-link :to="switchLocalePath('en')" class="mx-4">English</nuxt-link>
+          <nuxt-link :to="switchLocalePath('zh')" class="mx-4">Chinese</nuxt-link> -->
+
+          <v-list dense tile elevation="0" flat >
+            <v-list-item-group
+              v-model="selectedNav"
+              color="primary"
+              class="d-flex"
+            >
+              <v-list-item
+                v-for="(item, i) in nav"
+                :key="i"
+                class="mx-4"
+                :to="item.url"
+              >
+                <v-list-item-content  :class="item.className">
+                  <v-list-item-title v-text="item.title"></v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list-item-group>
+          </v-list>
+        </v-flex>
           <!-- <a
             href="zh"
             @click="$router.push(localeRoute({
@@ -112,6 +133,13 @@ export default {
       clipped: false,
       drawer: false,
       fixed: false,
+      selectedNav: 0,
+      nav: [
+        { title: 'Home' },
+        { title: 'Why Bitss' },
+        { title: 'Login', className: 'login', url: '/login' },
+        { title: 'Get Started', className: 'get-started' },
+      ],
       items: [
         {
           icon: 'mdi-apps',

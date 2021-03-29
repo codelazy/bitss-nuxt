@@ -1,5 +1,4 @@
 import colors from 'vuetify/es5/util/colors'
-
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
@@ -44,7 +43,13 @@ export default {
   modules: [
     'nuxt-i18n'
   ],
-
+  
+  //ANALYTICS
+  // buildModules: [
+  //   ['@nuxtjs/google-analytics', {
+  //     id: 'UA-12301-2'
+  //   }]
+  // ]
   // Vuetify module configuration: https://go.nuxtjs.dev/config-vuetify
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
@@ -52,8 +57,10 @@ export default {
       dark: false,
       themes: {
         light: {
-          primary: colors.amber.darken3,
-          background: colors.blue.lighten5,
+          primary: '#7D499D',
+          secondary: '#80479C',
+          textPrimary: '#422265',
+          background: '#EEE1F6',
         },
         dark: {
           primary: colors.blue.darken2,
@@ -83,9 +90,12 @@ export default {
           welcome: 'Welcome',
           homepage: {
             banner: {
-              bannerTitle: 'Shortened URL, decrypted.',
-              bannerSubTitle: 'Say hello to branded human-readable links.',
-              bannerLink: 'https://communicate.effectively.today',
+              bannerTitle: 'Shortened URL,',
+              bannerSubTitle1: 'Branded',
+              bannerSubTitle2: '&',
+              bannerSubTitle3: 'Decrypted',
+              bannerCaption: 'Say hello to branded human-readable links.',
+              bannerLink: 'watch.bitss.intro.video',
             },
             form: {
               textfieldLinkPlaceholder: 'Place your target link here...',
