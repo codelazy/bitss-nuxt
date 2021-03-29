@@ -44,7 +44,9 @@
       flat
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-img src="https://bitss.com/assets/img/bitss-logo.jpg" max-height="40px" max-width="200px" aspect-ratio="1.7" position="left" contain class="my-2"></v-img>
+      <v-btn text elevation="0" to="/" height="40px" width="93px" class="pa-0">
+        <v-img src="https://bitss.com/assets/img/bitss-logo.jpg" max-height="40px" max-width="200px" aspect-ratio="1.7" position="left" contain class="my-2"></v-img>
+      </v-btn>
       
       <v-spacer />
     </v-app-bar>

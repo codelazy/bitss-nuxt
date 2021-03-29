@@ -70,7 +70,7 @@
     <v-row class="pa-8">
       <template v-for="item in feautured_member">
         <v-col cols="12" sm="3" md="3">
-          <v-card elevation="4" class="mt-4 pa-4">
+          <v-card elevation="0" class="mt-4 pa-4 box-shadow">
             <h6 v-text="item.title" class="text-center text-h6 font-weight-bold"/>
             <v-img
               :lazy-src="item.img"
@@ -84,7 +84,15 @@
     </v-row>
   </v-main>
 </template>
+<style>
+.box-shadow {
+  -ms-box-shadow: 0 2px 9px 0 rgba(0, 0, 0, 0.03);
+  -o-box-shadow: 0 2px 9px 0 rgba(0, 0, 0, 0.03);
+  -webkit-box-shadow: 0 2px 9px 0 rgb(0 0 0 / 3%);
+  box-shadow: 0 2px 9px 0 rgb(0 0 0 / 3%);
+}
 
+</style>
 <script>
 import Logo from '~/components/Logo.vue'
 import VuetifyLogo from '~/components/VuetifyLogo.vue'
